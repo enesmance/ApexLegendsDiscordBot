@@ -1,6 +1,6 @@
 const {Client, IntentsBitField} = require('discord.js');
 const axios = require('axios');
-const TOKEN = 'MTIwNjc1MjEzOTY1Mzk0NzQwMw.GgV7Fk.JlOBk80LLOUVFsQvCJzZzvoJLV14_LWqb2c9jU';
+const TOKEN = 'MTIwNjc1MjEzOTY1Mzk0NzQwMw.Gbn-5m.JFpMV4aU3UURAjRs_Cuoz1ncT8uYXYzVM7kkLM';
 const PREFIX = '!';
 const MOZAMBIQUE_API_KEY  = '7f6a7ee8443864ced36036e755c2819f';
 
@@ -69,6 +69,35 @@ client.on('messageCreate', async (message) => {
             const remainingTime = stats.current.remainingTimer;
             message.reply(`Current Map: ${currMap}\n Rotating to ${nextMap} in ${remainingTime}`);
 
+            
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                console.error('Unauthorized - Invalid authentication credentials. Check API key and permissions.');
+              } else {
+                console.error('Error fetching Map:', error.message);
+              }
+              message.channel.send('Error fetching Map. Please try again later.');
+        }
+    }
+
+    if(command === 'news'){
+        try {
+            const response = await axios.get(`https://api.mozambiquehe.re/news?auth=${MOZAMBIQUE_API_KEY}`);
+            const newsItems = response.data; // Adjust this based on the API response structure
+            
+            for (const item of newsItems) {
+                const title = item.title;
+                const shortDesc = item.short_desc;
+
+                // Create a message for each news item
+                const messageText = `**${title}**\n${shortDesc}\n\nRead more: ${item.link}`;
+
+                // Send the message to the channel
+                message.reply(messageText);
+                break;
+            }
+            
+            console.log('API Response:', response.data);
             
         } catch (error) {
             if (error.response && error.response.status === 401) {
